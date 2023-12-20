@@ -1,19 +1,34 @@
-import React from "react";
-import "./ExpenseForm.css"
+import React, { useState } from "react";
+import "./ExpenseForm.css";
 
 export default function ExpenseForm(props) {
-const changeHandler = (event) =>{
-  console.log(event.target.value)
-}
+  const [enterdTitle, setEnterdTitle] = useState("");
+  const changeTitleHandler = (event) => {
+    setEnterdTitle(event.target.value);
+    console.log(enterdTitle); // Note: You may not see the updated value immediately
+  };
+
+  const [enterdAmount, setEnterdAmount] = useState("");
+  const changeAmountHandler = (event) => {
+    setEnterdAmount(event.target.value);
+    console.log(enterdAmount); // Note: You may not see the updated value immediately
+  };
+
+  const [enterdDate, setEnterdDate] = useState("");
+  const changeDateHandler = (event) => {
+    setEnterdDate(event.target.value);
+    console.log(enterdDate); // Note: You may not see the updated value immediately
+  };
+
   return (
-    <form onChange={changeHandler}>
+    <form>
       <label>Expense title:</label>
-      <input type="text"></input>
+      <input type="text" onChange={changeTitleHandler} />
       <label>Expense amount:</label>
-      <input type="number" />
+      <input type="number" onChange={changeAmountHandler} />
       <label>Date:</label>
-      <input type="date" />
-      <button >Add Expenses</button>
+      <input type="date" onChange={changeDateHandler} />
+      <button>Add Expenses</button>
     </form>
   );
 }
