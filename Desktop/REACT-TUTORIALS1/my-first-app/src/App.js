@@ -1,6 +1,8 @@
 import "./App.css";
 import ExpenseItems from "./components/Expenses/ExpenseItems";
 
+import NewExpense from "./components/NewExpenses/NewExpense";
+
 function App() {
   const expenses = [
     {
@@ -23,8 +25,11 @@ function App() {
       date: new Date(2021, 5, 12),
     },
   ];
+
   return (
     <div>
+      <NewExpense />
+
       {expenses.map((expense) => (
         <ExpenseItems
           key={expense.id}
@@ -33,6 +38,8 @@ function App() {
           date={expense.date}
         />
       ))}
+
+
     </div>
   );
 }
