@@ -11,24 +11,33 @@ export default function ExpenseForm(props) {
   const [enterdAmount, setEnterdAmount] = useState("");
   const changeAmountHandler = (event) => {
     setEnterdAmount(event.target.value);
-    console.log(enterdAmount); // Note: You may not see the updated value immediately
   };
 
   const [enterdDate, setEnterdDate] = useState("");
   const changeDateHandler = (event) => {
     setEnterdDate(event.target.value);
-    console.log(enterdDate); // Note: You may not see the updated value immediately
   };
 
+
+  const submitHandler = (event) =>{
+    event.preventDefault()
+    const expenseData = {
+      title:enterdTitle,
+      amount:enterdAmount,
+      date:new Date(enterdAmount)
+    }
+    console.log(expenseData)
+  }
+
   return (
-    <form>
+    <form onSubmit={submitHandler}>
       <label>Expense title:</label>
       <input type="text" onChange={changeTitleHandler} />
       <label>Expense amount:</label>
       <input type="number" onChange={changeAmountHandler} />
       <label>Date:</label>
       <input type="date" onChange={changeDateHandler} />
-      <button>Add Expenses</button>
+      <button type="submit">Add Expenses</button>
     </form>
   );
 }
