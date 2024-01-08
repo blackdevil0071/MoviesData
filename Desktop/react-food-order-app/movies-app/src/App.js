@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import Movies from "./Movies";
 import { Spinner, Button } from "react-bootstrap";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -10,10 +10,11 @@ function App() {
   const [error, setError] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
-  async function fetchMoviesHandler() {
+
+  const fetchMoviesHandler =useCallback(async ()=> {
     setError(false);
     setIsLoading(true);
-    setRetrying(true); // Start retrying
+    setRetrying(true); 
 
     try {
       const response = await fetch("https://swapi.dev/api/films/");
@@ -36,7 +37,11 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }
+  })
+
+  useEffect(()=>{
+    fetchMoviesHandler()
+  },[fetchMoviesHandler])
 
   const handleCancelRetry = () => {
     setRetrying(false);
@@ -64,8 +69,6 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={fetchMoviesHandler}>Fetch Movies</button>
-      <pre></pre>
       {content} <div></div>
     </div>
   );
