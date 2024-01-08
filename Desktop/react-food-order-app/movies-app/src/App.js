@@ -3,6 +3,7 @@ import "./App.css";
 import Movies from "./Movies";
 import { Spinner, Button } from "react-bootstrap";
 import React, { useCallback, useEffect, useState } from "react";
+import AddMovies from "./AddMovies";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -69,6 +70,7 @@ function App() {
 
   return (
     <div className="App">
+      <AddMovies/>
       {content} <div></div>
     </div>
   );
