@@ -1,9 +1,8 @@
-import logo from "./logo.svg";
-import "./App.css";
-import Movies from "./Movies";
-import { Spinner, Button } from "react-bootstrap";
+// App.jsx
 import React, { useCallback, useEffect, useState } from "react";
+import { Spinner, Button } from "react-bootstrap";
 import AddMovies from "./AddMovies";
+import MoviesList from "./MoviesList";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -11,38 +10,92 @@ function App() {
   const [error, setError] = useState(false);
   const [retrying, setRetrying] = useState(false);
 
-
-  const fetchMoviesHandler =useCallback(async ()=> {
+  const fetchData = async () => {
     setError(false);
     setIsLoading(true);
-    setRetrying(true); 
 
     try {
-      const response = await fetch("https://swapi.dev/api/films/");
+      const response = await fetch("https://react-app-1e677-default-rtdb.firebaseio.com/movies.json");
       if (!response.ok) {
         throw new Error("Something went wrong....Retrying");
       }
+
       const data = await response.json();
-      setMovies(data.results);
-      setRetrying(false); // Stop retrying on successful fetch
+      const loadedMovies = Object.keys(data).map((key) => ({
+        id: key,
+        ...data[key],
+      }));
+
+      setMovies(loadedMovies);
     } catch (error) {
       console.log("ERROR", error.message);
-      setError(error.message);
 
-      // Retry the fetch after 5 seconds if retrying is true
       if (retrying) {
         setTimeout(() => {
-          fetchMoviesHandler();
+          fetchData();
         }, 5000);
       }
     } finally {
       setIsLoading(false);
     }
-  })
+  };
 
-  useEffect(()=>{
-    fetchMoviesHandler()
-  },[fetchMoviesHandler])
+  const fetchMoviesHandler = useCallback(() => {
+    fetchData();
+  }, [retrying]);
+
+  useEffect(() => {
+    fetchMoviesHandler();
+  }, [fetchMoviesHandler, retrying]);
+
+  const addMovieHandler = async (movie) => {
+    try {
+      const response = await fetch("https://react-app-1e677-default-rtdb.firebaseio.com/movies.json", {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add movie");
+      }
+
+      const data = await response.json();
+      console.log("Successfully added:", data);
+
+      // Update the local state with the new movie
+      setMovies((prevMovies) => [
+        ...prevMovies,
+        {
+          id: data.name, // Assuming Firebase returns the unique ID
+          ...movie,
+        },
+      ]);
+    } catch (error) {
+      console.error("Error adding movie:", error.message);
+    }
+  };
+
+  const deleteMovieHandler = async (id) => {
+    try {
+      const response = await fetch(`https://react-app-1e677-default-rtdb.firebaseio.com/movies/${id}.json`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete movie");
+      }
+
+      console.log("Successfully deleted:", id);
+
+      // Update the local state by filtering out the deleted movie
+      setMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== id));
+    } catch (error) {
+      console.error("Error deleting movie:", error.message);
+    }
+  };
 
   const handleCancelRetry = () => {
     setRetrying(false);
@@ -57,7 +110,7 @@ function App() {
     );
   }
   if (movies.length > 0) {
-    content = <Movies movies={movies} />;
+    content = <MoviesList movies={movies} onDeleteMovie={deleteMovieHandler} />;
   }
   if (error) {
     content = (
@@ -70,8 +123,8 @@ function App() {
 
   return (
     <div className="App">
-      <AddMovies/>
-      {content} <div></div>
+      <AddMovies onAddMovie={addMovieHandler} />
+      {content}
     </div>
   );
 }
